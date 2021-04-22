@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCashRegister, faPlus } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -20,14 +20,22 @@ export default () => {
   let user = AuthService.getCurrentUser();
 
   //save user balance
-  const [userBalance, setBalance] = useState(1000);
+  const [userBalance, setBalance] = useState(0);
+
+  useEffect(() => {
+    AuthService.getBalance(user.message.address).then(data => {
+      console.log(data.data)
+      setBalance(data.data);
+    })
+  })
 
   const initialState = {
-    receiverEmail: "",
+    address: "",
+    password: "",
     amount: "",
   };
 
-  const [{ receiverEmail, amount }, setAmount] = useState(initialState);
+  const [{ address, password, amount }, setAmount] = useState(initialState);
 
   const handelOnChange = (e) => {
     const { id, value } = e.target;
@@ -38,10 +46,18 @@ export default () => {
   const handelSubmit = (e) => {
     e.preventDefault();
     const userData = {
-      receiverEmail: receiverEmail,
+      address: address,
+      password: password,
       amount: amount,
     };
     console.log(userData);
+    AuthService.transferMoney(address, password, amount, user.message.address).then(data => {
+      const { status } = data
+
+      if (status) {
+        AuthService.getBalance(user.message.address).then(data => setBalance(data.data))
+      }
+    });
   };
 
   let [showTransactionInput, setState] = useState(true);
@@ -78,17 +94,28 @@ export default () => {
           <div className="col-5">
             <Form className="mt-4" onSubmit={handelSubmit}>
               <Form.Group className="mb-4">
-                <Form.Label>Sender Email</Form.Label>
+                <Form.Label>Address</Form.Label>
                 <InputGroup>
-                  <InputGroup.Text>
-                    <FontAwesomeIcon icon={faEnvelope} />
-                  </InputGroup.Text>
+
                   <Form.Control
-                    id="receiverEmail" onChange={handelOnChange} value={receiverEmail}
+                    id="address" onChange={handelOnChange} value={address}
                     autoFocus
                     required
-                    type="email"
-                    placeholder="example@company.com"
+
+                    placeholder=""
+                  />
+                </InputGroup>
+              </Form.Group>
+              <Form.Group className="mb-4">
+                <Form.Label>Password</Form.Label>
+                <InputGroup>
+
+                  <Form.Control
+                    id="password" onChange={handelOnChange} value={password}
+                    autoFocus
+                    required
+                    type="password"
+                    placeholder=""
                   />
                 </InputGroup>
               </Form.Group>

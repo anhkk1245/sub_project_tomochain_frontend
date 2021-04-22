@@ -34,21 +34,30 @@ const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem("user"));
 };
 
-const transferMoney = (receiverEmail, senderAddress, password, amount) => {
-  return axios.post(API_URL + "", {
-    receiverEmail,
+const transferMoney = (address, password, amount, senderAddress) => {
+  return axios.post(API_URL + "tradeToken", {
     senderAddress,
+    
     password,
-    amount,
+    address,
+    amount
+    
   }).then((response) => {
     return response.data;
   });
 }
+
+const getBalance = (address) => {
+  return axios.post(API_URL + "getBalance", {
+    address
+  });
+};
 
 export default {
   register,
   login,
   logout,
   getCurrentUser,
-  transferMoney
+  transferMoney, 
+  getBalance
 };
