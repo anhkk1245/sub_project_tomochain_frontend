@@ -7,7 +7,6 @@ import { Nav, Row, Col, Container } from '@themesberg/react-bootstrap';
 
 import Documentation from "../../components/Documentation";
 
-
 export default () => (
   <article>
     <Container className="px-0">
