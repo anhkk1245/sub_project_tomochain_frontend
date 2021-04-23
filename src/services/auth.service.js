@@ -35,21 +35,21 @@ const getCurrentUser = () => {
 };
 
 const transferMoney = (address, password, amount, senderAddress) => {
-  return axios.post(API_URL + "tradeToken", {
-    senderAddress,
-    
-    password,
-    address,
-    amount
-    
-  }).then((response) => {
-    return response.data;
-  });
-}
+  return axios
+    .post(API_URL + "tradeToken", {
+      senderAddress,
+      password,
+      address,
+      amount,
+    })
+    .then((response) => {
+      return response.data;
+    });
+};
 
 const getBalance = (address) => {
   return axios.post(API_URL + "getBalance", {
-    address
+    address,
   });
 };
 
@@ -58,6 +58,6 @@ export default {
   login,
   logout,
   getCurrentUser,
-  transferMoney, 
-  getBalance
+  transferMoney,
+  getBalance,
 };
