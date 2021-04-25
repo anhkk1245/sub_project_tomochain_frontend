@@ -11,9 +11,22 @@ import {
 } from "@themesberg/react-bootstrap";
 import { CounterWidget } from "../../components/Widgets";
 import AuthService from "../../services/auth.service";
+import { Hint } from "react-autocomplete-hint";
+import axios from 'axios';
 
 export default () => {
+  const [hintData, setHintData] = useState([])
   let user = AuthService.getCurrentUser();
+  const getData = async () => {
+    const res = await axios.get('http://localhost:8000/api/getUser')
+      var hintArray = []
+       res.data.map(a => hintArray.push(a.email))
+        setHintData(hintArray)
+  }
+
+  useEffect(()=> {
+    getData()
+  })
 
   //save user balance
   const [userBalance, setBalance] = useState(0);
@@ -52,25 +65,25 @@ export default () => {
     };
     console.log(userData);
 
-    // AuthService.transferMoney(
-    //   address,
-    //   password,
-    //   amount,
-    //   user.message.address
-    // ).then((data) => {
-    //   const { status } = data;
+    AuthService.transferMoney(
+      address,
+      password,
+      amount,
+      user.message.address
+    ).then((data) => {
+      const { status } = data;
 
-    //   if (status) {
-    //     AuthService.getBalance(user.message.address).then((data) =>
-    //       setBalance(data.data)
-    //     );
-    //   }
-    // });
-
+      if (status) {
+        AuthService.getBalance(user.message.address).then((data) =>
+          setBalance(data.data)
+        );
+      }
+    });
+    console.log(hintData)
     toggleShowToast();
   };
 
-  let [showTransactionInput, setState] = useState(false);
+  let [showTransactionInput, setState] = useState(true);
 
   const handleOnClick = () => {
     setState(!showTransactionInput);
@@ -102,26 +115,29 @@ export default () => {
           <FontAwesomeIcon icon={faPlus} className="me-2" />
           New Transaction
         </Button>
+
         {showTransactionInput && (
           <Form className="mt-4 row" onSubmit={handelSubmit}>
             <Row>
               <Col>
-                <Form.Group className="mb-4 col">
-                  <Form.Label>Address</Form.Label>
-                  <InputGroup>
-                    <Form.Control
+                <div className="form-group">
+                  <label className="mb-2">Address</label>
+                  <Hint options={hintData} allowTabFill>
+                    <input
+                      className="form-control"
                       id="address"
                       onChange={handelOnChange}
                       value={address}
+                      type="email"
                       autoFocus
                       required
-                      placeholder=""
-                    />
-                  </InputGroup>
-                </Form.Group>
+                      placeholder="user@gmail.com"
+                    ></input>
+                  </Hint>
+                </div>
               </Col>
               <Col>
-                <Form.Group className="mb-4" col>
+                <Form.Group className="mb-4">
                   <Form.Label>Password</Form.Label>
                   <InputGroup>
                     <Form.Control
@@ -139,7 +155,7 @@ export default () => {
 
               <Col>
                 <Form.Group>
-                  <Form.Group className="mb-4 col">
+                  <Form.Group className="mb-4">
                     <Form.Label>Enter your amount</Form.Label>
                     <InputGroup>
                       <Form.Control

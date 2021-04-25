@@ -59,5 +59,5 @@ export default {
   logout,
   getCurrentUser,
   transferMoney,
-  getBalance,
+  getBalance
 };
